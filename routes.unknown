@@ -1,0 +1,35 @@
+import express from "express";
+import db from "../db.js";
+
+const router = express.Router();
+
+// Register User
+router.post("/register", (req, res) => {
+    const { name, email, password, role } = req.body;
+
+    const sql = "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)";
+
+    db.query(sql, [name, email, password, role], (err, data) => {
+        if (err) return res.json({ error: err });
+        return res.json({ message: "User Registered Successfully" });
+    });
+});
+
+// Login User
+router.post("/login", (req, res) => {
+    const { email, password } = req.body;
+
+    const sql = "SELECT * FROM users WHERE email = ? AND password = ?";
+
+    db.query(sql, [email, password], (err, data) => {
+        if (err) return res.json({ error: err });
+
+        if (data.length > 0) {
+            return res.json({ message: "Login Successful", user: data[0] });
+        } else {
+            return res.json({ message: "Invalid Credentials" });
+        }
+    });
+});
+
+export default router;
